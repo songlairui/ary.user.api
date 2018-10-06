@@ -21,14 +21,6 @@ const server = new Hapi.Server({
   server.route([...hi, ...routerUsers])
   await server.register([...pluginSwagger, hapiAuthJwt2])
   pluginAuth(server)
-  server.log(['error', 'database', 'read'])
-  server.events.on('log', (event, tags) => {
-    if (tags.error) {
-      console.log(
-        `Server error: ${event.error ? event.error.message : 'unknown'}`
-      )
-    }
-  })
   server.start()
   console.warn(`listening at ${host}:3456`)
 })()
