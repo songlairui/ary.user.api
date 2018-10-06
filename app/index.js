@@ -1,15 +1,22 @@
 const Hapi = require('hapi')
+const env = require('env2')
+const path = require('path')
 
-const hi = require('./router')
+env(path.resolve(__dirname, '../.env'))
+
+const pluginSwagger = require('./plugins/swagger')
+const hi = require('./routers/hi')
+const routerUsers = require('./routers/user')
+const host = require('./host')
 
 const server = new Hapi.Server({
-    host: '0.0.0.0',
-    port: 3456
+  host,
+  port: 3456
 })
 
 !(async () => {
-    server.route([...hi])
-    // await server.
-    server.start()
-    console.warn(`listening at 0.0.0.0:3456`)
+  server.route([...hi, ...routerUsers])
+  await server.register([...pluginSwagger])
+  server.start()
+  console.warn(`listening at ${host}:3456`)
 })()

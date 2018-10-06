@@ -20,6 +20,7 @@
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",
     "joi": "^13.7.0",
+    "jsonwebtoken": "^8.3.0",
     "package": "^1.0.1",
     "sequelize": "^4.39.0",
     "sqlite3": "^4.0.2",
