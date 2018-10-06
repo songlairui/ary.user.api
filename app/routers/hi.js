@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken')
 const Joi = require('joi')
 const { jwtHeaderDefine } = require('../utils/router-helper')
+const { generateJWT } = require('../utils/jwt-helper')
 
 module.exports = [
   {
@@ -18,13 +19,6 @@ module.exports = [
     method: 'POST',
     path: '/jwt',
     async handler(request) {
-      const generateJWT = jwtinfo => {
-        const payload = {
-          username: jwtinfo.username,
-          exp: Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60
-        }
-        return JWT.sign(payload, process.env.SECRET)
-      }
       return generateJWT({ username: request.query.username })
     },
     config: {
@@ -44,13 +38,8 @@ module.exports = [
     method: 'GET',
     path: '/jwt',
     async handler(request) {
-      try {
-        const { credentials } = request.auth
-        return JSON.stringify(credentials)
-      } catch (error) {
-        console.warn(error)
-        return `${error}`
-      }
+      const { credentials } = request.auth
+      return JSON.stringify(credentials)
     },
     config: {
       tags: ['api', 'tests'],

@@ -1,22 +1,54 @@
-const models = require('../../models')
 const Joi = require('joi')
+const models = require('../../models')
 const { jwtHeaderDefine } = require('../utils/router-helper')
+const { generateJWT } = require('../utils/jwt-helper')
 
 module.exports = [
   {
     method: 'POST',
     path: '/login',
-    async handler(request, h) {},
+    async handler(request, h) {
+      const { username, password } = request.query
+      const existedUser = (await models.users.findAll({
+        where: { name: username }
+      }))[0]
+      if (!existedUser) {
+        return h.response('The user was not exist').code(401)
+      }
+      if (existedUser.password !== password) {
+        return h.response('paasword was not right').code(401)
+      }
+      return generateJWT({ username })
+    },
     config: {
       tags: ['api', 'users'],
-      auth: false
+      auth: false,
+      validate: {
+        query: {
+          username: Joi.string()
+            .required()
+            .description('用户名'),
+
+          password: Joi.string()
+            .required()
+            .description('密码')
+        }
+      }
     }
   },
   {
     method: 'GET',
-    path: '/user/:id',
-    async handler(request, h) {},
+    path: '/user',
+    async handler(request, h) {
+      const { credentials: { username } = {} } = request.auth
+      const existedUser = (await models.users.findAll({
+        where: { name: username }
+      }))[0]
+      console.assert(existedUser, '用户不存在')
+      return existedUser
+    },
     config: {
+      tags: ['api', 'users'],
       validate: {
         ...jwtHeaderDefine
       }
