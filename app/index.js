@@ -14,7 +14,18 @@ const pluginAuth = require('./plugins/auth-jwt2')
 
 const server = new Hapi.Server({
   host,
-  port: 3456
+  port: 3456,
+  routes: {
+    cors: {
+      origin: ['*'],
+      credentials: true
+    },
+    validate: {
+      failAction: (__, ___, err) => {
+        throw err
+      }
+    }
+  }
 })
 
 !(async () => {

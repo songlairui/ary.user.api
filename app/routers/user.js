@@ -6,9 +6,17 @@ const { generateJWT } = require('../utils/jwt-helper')
 module.exports = [
   {
     method: 'POST',
+    path: '/logout',
+    async handler() {
+      // 注销登录接口，暂时不关联业务逻辑
+      // 可能常见websocket应用场景的时候会用到。
+    }
+  },
+  {
+    method: 'POST',
     path: '/login',
     async handler(request, h) {
-      const { username, password } = request.query
+      const { username, password } = request.payload
       const existedUser = (await models.users.findAll({
         where: { name: username }
       }))[0]
@@ -24,11 +32,10 @@ module.exports = [
       tags: ['api', 'users'],
       auth: false,
       validate: {
-        query: {
+        payload: {
           username: Joi.string()
             .required()
             .description('用户名'),
-
           password: Joi.string()
             .required()
             .description('密码')
