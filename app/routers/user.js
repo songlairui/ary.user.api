@@ -51,8 +51,7 @@ module.exports = [
       const existedUser = (await models.users.findAll({
         where: { name: username }
       }))[0]
-      console.assert(existedUser, '用户不存在')
-      return existedUser
+      return existedUser ? existedUser : h.response('user not exists').code(404)
     },
     config: {
       tags: ['api', 'users'],
@@ -65,13 +64,13 @@ module.exports = [
     method: 'POST',
     path: '/user',
     async handler(request, h) {
-      const { username, password } = request.query
+      const { username, password } = request.payload
       const Users = models.users
       const newUser = Users.build({
         name: username,
         password
       })
-      console.warn('instance created', newUser)
+      console.warn('instance created', username, password)
       return newUser
         .save()
         .then(() => {
@@ -86,7 +85,7 @@ module.exports = [
       tags: ['api', 'user'],
       auth: false,
       validate: {
-        query: {
+        payload: {
           username: Joi.string().description('用户名'),
           password: Joi.string().description('密码')
         }
